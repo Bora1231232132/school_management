@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  school-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: school_web
+    restart: unless-stopped
+    ports:
+      - "80:80" # Change the left port if 80 is already taken, e.g. "3000:80"
+    # Optional: add health check
+    healthcheck:
+      test:
+        ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

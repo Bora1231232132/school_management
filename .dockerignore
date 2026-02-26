@@ -1,0 +1,11 @@
+# Docker ignore – keeps the build context lean & fast
+node_modules
+dist
+.git
+.gitignore
+.vscode
+.agent
+*.md
+*.log
+npm-debug.log*
+.DS_Store
