@@ -1,19 +1,83 @@
-version: "3.9"
-
 services:
+  # ─── Frontend (React + Vite → Nginx) ──────────────────────────────
   school-web:
     build:
       context: .
       dockerfile: Dockerfile
+    image: school-web:latest # ← explicit name, same on all machines
     container_name: school_web
     restart: unless-stopped
     ports:
-      - "80:80" # Change the left port if 80 is already taken, e.g. "3000:80"
-    # Optional: add health check
+      - "80:80"
     healthcheck:
-      test:
-        ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  # ─── Backend (NestJS API) ──────────────────────────────────────────
+  # Uncomment this section when backend code is ready
+  # api:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: school_api
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: production
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_NAME: ${POSTGRES_DB}
+  #     DB_USER: ${POSTGRES_USER}
+  #     DB_PASS: ${POSTGRES_PASSWORD}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+  # ─── Database (PostgreSQL) ────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: school_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-school_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432" # host:container — use 5433 externally to avoid conflicts
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-school_db}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Database Admin UI (pgAdmin) ─────────────────────────────────
+  # Optional – access at http://localhost:5050
+  # Uncomment to enable
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: school_pgadmin
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5050:80"
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@ccc.edu.kh}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+  #   depends_on:
+  #     - postgres
+
+volumes:
+  postgres_data: # Persistent storage for PostgreSQL data
