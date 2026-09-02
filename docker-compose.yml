@@ -9,8 +9,12 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - ${TLS_CERT_PATH:?TLS_CERT_PATH environment variable is required}:/etc/ssl/certs/cheachantocollege.crt:ro
+      - ${TLS_KEY_PATH:?TLS_KEY_PATH environment variable is required}:/etc/ssl/private/cheachantocollege.key:ro
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: ["CMD", "curl", "-k", "-f", "https://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
