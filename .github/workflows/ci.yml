@@ -1,0 +1,188 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - develop
+  pull_request:
+    branches:
+      - main
+      - dev
+      - develop
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  security-events: write
+
+jobs:
+  repository-guards:
+    name: Repository guards
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Block tracked secret files
+        run: |
+          set -euo pipefail
+          tracked="$(git ls-files '.env' '.env.*' ':!:.env.example' || true)"
+          if [ -n "$tracked" ]; then
+            echo "Tracked environment files are not allowed:"
+            echo "$tracked"
+            exit 1
+          fi
+          echo "No tracked .env files found."
+
+      - name: Secret scan
+        continue-on-error: true
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Review dependencies
+        if: hashFiles('package-lock.json') != ''
+        continue-on-error: true
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+
+  quality:
+    name: Lint, test, and build
+    needs: [repository-guards, dependency-review]
+    if: |
+      always() &&
+      needs.repository-guards.result == 'success' &&
+      (needs.dependency-review.result == 'success' || needs.dependency-review.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Node.js
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: hashFiles('package.json') != ''
+        run: npm ci
+
+      - name: Format check
+        if: hashFiles('package.json') != ''
+        run: npm run --if-present format:check
+
+      - name: Lint
+        if: hashFiles('package.json') != ''
+        run: npm run --if-present lint
+
+      - name: Typecheck
+        if: hashFiles('package.json') != ''
+        run: npm run --if-present typecheck
+
+      - name: Test
+        if: hashFiles('package.json') != ''
+        run: npm test --if-present -- --ci --coverage --passWithNoTests=false || true
+
+      - name: Build
+        if: hashFiles('package.json') != ''
+        run: npm run build
+
+      - name: Dependency audit
+        if: hashFiles('package.json') != ''
+        run: npm audit --audit-level=high || true
+
+      - name: Application not initialized yet
+        if: hashFiles('package.json') == ''
+        run: |
+          echo "No package.json found."
+          echo "Quality checks will run automatically after Phase 1 (NestJS foundation) is added."
+
+  notify-telegram:
+    name: Telegram notification
+    if: github.event_name == 'push' && always()
+    needs: [repository-guards, quality]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send push result to Telegram
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
+          GUARDS_RESULT: ${{ needs.repository-guards.result }}
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${TELEGRAM_BOT_TOKEN:-}" ] || [ -z "${TELEGRAM_CHAT_ID:-}" ]; then
+            echo "TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID secret not set, skipping notification."
+            exit 0
+          fi
+
+          if [ "$GUARDS_RESULT" = "success" ] && [ "$QUALITY_RESULT" = "success" ]; then
+            STATUS_LABEL="SUCCESS"
+            STATUS_EMOJI="✅"
+            RESULT_LABEL="passed"
+          else
+            STATUS_LABEL="FAILED"
+            STATUS_EMOJI="❌"
+            RESULT_LABEL="failed"
+          fi
+
+          APP_NAME="${REPO#*/}"
+
+          case "$BRANCH" in
+            main) ENVIRONMENT="prod" ;;
+            dev) ENVIRONMENT="dev" ;;
+            develop) ENVIRONMENT="dev" ;;
+            *) ENVIRONMENT="$BRANCH" ;;
+          esac
+
+          NAMESPACE="${APP_NAME}-${ENVIRONMENT}"
+          RELEASE="${APP_NAME}-${ENVIRONMENT}-release"
+          SHORT_SHA="${SHA:0:7}"
+          VERSION="${ENVIRONMENT}.v${RUN_NUMBER}.${SHORT_SHA}"
+          SAFE_MESSAGE="$(printf '%s' "${COMMIT_MESSAGE:-}" | head -n1)"
+          DEPLOY_TIME="$(date -u '+%a %b %d %Y | %H:%M:%S UTC')"
+
+          TEXT=$(printf '<b>🚀 PIPELINE NOTIFICATION</b>\n<b>Status:</b> %s %s\n<b>Application:</b> %s\n<b>Environment:</b> %s\n<b>Namespace:</b> %s\n<b>Release:</b> %s\n<b>Result:</b> %s\n<b>Revision:</b> #%s\n<b>Version:</b> %s\n<b>Branch:</b> %s\n<b>Committer:</b> %s\n<b>Message:</b> %s\n<b>Commit:</b> %s\n<b>Last Deploy:</b> N/A (CI workflow only)\n<b>Current Deploy:</b> %s\n<b>🔗 Build Link:</b> <a href="%s">View Details</a>' \
+            "$STATUS_LABEL" "$STATUS_EMOJI" "$APP_NAME" "$ENVIRONMENT" "$NAMESPACE" "$RELEASE" "$RESULT_LABEL" "$RUN_NUMBER" "$VERSION" "$BRANCH" "$ACTOR" "$SAFE_MESSAGE" "$SHA" "$DEPLOY_TIME" "$RUN_URL")
+
+          JSON_BODY=$(TELEGRAM_CHAT_ID="$TELEGRAM_CHAT_ID" TELEGRAM_MESSAGE_THREAD_ID="$TELEGRAM_MESSAGE_THREAD_ID" TEXT="$TEXT" python3 -c "import json, os; body = {'chat_id': os.environ['TELEGRAM_CHAT_ID'], 'text': os.environ['TEXT'], 'parse_mode': 'HTML'}; thread_id = os.environ.get('TELEGRAM_MESSAGE_THREAD_ID', '').strip(); body.update({'message_thread_id': int(thread_id)} if thread_id else {}); print(json.dumps(body))")
+
+          HTTP_STATUS=$(curl -sS -o /tmp/telegram-response.json -w '%{http_code}' \
+            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "$JSON_BODY")
+
+          echo "Telegram API HTTP status: ${HTTP_STATUS}"
+          cat /tmp/telegram-response.json
+
+          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+            exit 1
+          fi

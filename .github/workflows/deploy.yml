@@ -1,0 +1,135 @@
+name: CD Pipeline - Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Deployment Secrets
+        run: |
+          missing_secrets=()
+          if [ -z "${{ secrets.SERVER_HOST }}" ]; then
+            missing_secrets+=("SERVER_HOST")
+          fi
+          if [ -z "${{ secrets.SERVER_USER }}" ]; then
+            missing_secrets+=("SERVER_USER")
+          fi
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            missing_secrets+=("SSH_PRIVATE_KEY")
+          fi
+
+          if [ ${#missing_secrets[@]} -ne 0 ]; then
+            echo "❌ ERROR: Missing required GitHub Secrets:"
+            for secret in "${missing_secrets[@]}"; do
+              echo "  - $secret"
+            done
+            echo "Please configure these secrets under Repository Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+          echo "✅ All required deployment secrets are configured."
+
+      - name: Deploy via SSH & Docker Compose
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            DEPLOY_PATH="${{ secrets.DOCKER_COMPOSE_PATH || secrets.DEPLOY_PATH || '~/school_management' }}"
+            
+            echo "🚀 [1/4] Navigating to project directory: $DEPLOY_PATH"
+            eval cd "$DEPLOY_PATH"
+
+            echo "📥 [2/4] Pulling latest changes from main branch..."
+            git fetch origin main
+            git checkout main
+            git pull origin main
+
+            echo "🐳 [3/4] Building and launching containers via Docker Compose..."
+            docker compose up -d --build
+
+            echo "🔍 [4/4] Verifying running services..."
+            docker compose ps
+
+            echo "✅ Production deployment completed successfully!"
+
+  notify-telegram:
+    name: Telegram notification
+    if: always()
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send deployment result to Telegram
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${TELEGRAM_BOT_TOKEN:-}" ] || [ -z "${TELEGRAM_CHAT_ID:-}" ]; then
+            echo "TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID secret not set, skipping notification."
+            exit 0
+          fi
+
+          if [ "$DEPLOY_RESULT" = "success" ]; then
+            STATUS_LABEL="SUCCESS"
+            STATUS_EMOJI="✅"
+            RESULT_LABEL="deployed"
+          else
+            STATUS_LABEL="FAILED"
+            STATUS_EMOJI="❌"
+            RESULT_LABEL="deployment failed"
+          fi
+
+          APP_NAME="${REPO#*/}"
+          ENVIRONMENT="prod"
+          NAMESPACE="${APP_NAME}-${ENVIRONMENT}"
+          RELEASE="${APP_NAME}-${ENVIRONMENT}-release"
+          SHORT_SHA="${SHA:0:7}"
+          VERSION="${ENVIRONMENT}.v${RUN_NUMBER}.${SHORT_SHA}"
+          SAFE_MESSAGE="$(printf '%s' "${COMMIT_MESSAGE:-}" | head -n1)"
+          DEPLOY_TIME="$(date -u '+%a %b %d %Y | %H:%M:%S UTC')"
+
+          TEXT=$(printf '<b>🚀 PIPELINE NOTIFICATION</b>\n<b>Status:</b> %s %s\n<b>Application:</b> %s\n<b>Environment:</b> %s\n<b>Namespace:</b> %s\n<b>Release:</b> %s\n<b>Result:</b> %s\n<b>Revision:</b> #%s\n<b>Version:</b> %s\n<b>Branch:</b> %s\n<b>Committer:</b> %s\n<b>Message:</b> %s\n<b>Commit:</b> %s\n<b>Last Deploy:</b> Production Server\n<b>Current Deploy:</b> %s\n<b>🔗 Build Link:</b> <a href="%s">View Details</a>' \
+            "$STATUS_LABEL" "$STATUS_EMOJI" "$APP_NAME" "$ENVIRONMENT" "$NAMESPACE" "$RELEASE" "$RESULT_LABEL" "$RUN_NUMBER" "$VERSION" "$BRANCH" "$ACTOR" "$SAFE_MESSAGE" "$SHA" "$DEPLOY_TIME" "$RUN_URL")
+
+          JSON_BODY=$(TELEGRAM_CHAT_ID="$TELEGRAM_CHAT_ID" TELEGRAM_MESSAGE_THREAD_ID="$TELEGRAM_MESSAGE_THREAD_ID" TEXT="$TEXT" python3 -c "import json, os; body = {'chat_id': os.environ['TELEGRAM_CHAT_ID'], 'text': os.environ['TEXT'], 'parse_mode': 'HTML'}; thread_id = os.environ.get('TELEGRAM_MESSAGE_THREAD_ID', '').strip(); body.update({'message_thread_id': int(thread_id)} if thread_id else {}); print(json.dumps(body))")
+
+          HTTP_STATUS=$(curl -sS -o /tmp/telegram-response.json -w '%{http_code}' \
+            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "$JSON_BODY")
+
+          echo "Telegram API HTTP status: ${HTTP_STATUS}"
+          cat /tmp/telegram-response.json
+
+          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+            exit 1
+          fi
