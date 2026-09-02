@@ -27,10 +27,10 @@ jobs:
           echo "🚀 [1/4] Navigating to project directory: $DEPLOY_PATH"
           eval cd "$DEPLOY_PATH"
 
-          echo "📥 [2/4] Pulling latest changes from main branch..."
+          echo "📥 [2/4] Syncing latest changes from main branch..."
           git fetch origin main
-          git checkout main
-          git pull origin main
+          git checkout -f main
+          git reset --hard origin/main
 
           echo "🐳 [3/4] Building and launching containers via Docker Compose..."
           docker compose up -d --build
