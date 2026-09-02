@@ -16,59 +16,29 @@ permissions:
 jobs:
   deploy:
     name: Deploy to Production Server
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - name: Validate Deployment Secrets
+      - name: Deploy with Docker Compose
         run: |
-          missing_secrets=()
-          if [ -z "${{ secrets.SERVER_HOST }}" ]; then
-            missing_secrets+=("SERVER_HOST")
-          fi
-          if [ -z "${{ secrets.SERVER_USER }}" ]; then
-            missing_secrets+=("SERVER_USER")
-          fi
-          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
-            missing_secrets+=("SSH_PRIVATE_KEY")
-          fi
+          set -euo pipefail
 
-          if [ ${#missing_secrets[@]} -ne 0 ]; then
-            echo "❌ ERROR: Missing required GitHub Secrets:"
-            for secret in "${missing_secrets[@]}"; do
-              echo "  - $secret"
-            done
-            echo "Please configure these secrets under Repository Settings -> Secrets and variables -> Actions."
-            exit 1
-          fi
-          echo "✅ All required deployment secrets are configured."
+          DEPLOY_PATH="${{ secrets.DOCKER_COMPOSE_PATH || secrets.DEPLOY_PATH || '$HOME/school_management' }}"
 
-      - name: Deploy via SSH & Docker Compose
-        uses: appleboy/ssh-action@v1.2.1
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script_stop: true
-          script: |
-            set -euo pipefail
+          echo "🚀 [1/4] Navigating to project directory: $DEPLOY_PATH"
+          eval cd "$DEPLOY_PATH"
 
-            DEPLOY_PATH="${{ secrets.DOCKER_COMPOSE_PATH || secrets.DEPLOY_PATH || '~/school_management' }}"
-            
-            echo "🚀 [1/4] Navigating to project directory: $DEPLOY_PATH"
-            eval cd "$DEPLOY_PATH"
+          echo "📥 [2/4] Pulling latest changes from main branch..."
+          git fetch origin main
+          git checkout main
+          git pull origin main
 
-            echo "📥 [2/4] Pulling latest changes from main branch..."
-            git fetch origin main
-            git checkout main
-            git pull origin main
+          echo "🐳 [3/4] Building and launching containers via Docker Compose..."
+          docker compose up -d --build
 
-            echo "🐳 [3/4] Building and launching containers via Docker Compose..."
-            docker compose up -d --build
+          echo "🔍 [4/4] Verifying running services..."
+          docker compose ps
 
-            echo "🔍 [4/4] Verifying running services..."
-            docker compose ps
-
-            echo "✅ Production deployment completed successfully!"
+          echo "✅ Production deployment completed successfully!"
 
   notify-telegram:
     name: Telegram notification
