@@ -12,3 +12,9 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+certs/
+*.key
+*.crt
+*.pem
+*.pfx
+*.p12

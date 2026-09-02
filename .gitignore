@@ -52,3 +52,11 @@ coverage/
 # Environment variables
 .env*
 !.env.example
+
+# Local Certificates & Keys
+certs/
+*.key
+*.crt
+*.pem
+*.pfx
+*.p12
