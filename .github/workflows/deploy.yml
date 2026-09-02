@@ -32,10 +32,14 @@ jobs:
           git checkout -f main
           git reset --hard origin/main
 
-          echo "🐳 [3/4] Building and launching containers via Docker Compose..."
+          echo "🔐 [3/5] Ensuring SSL certificates and environment variables are present..."
+          chmod +x ./setup-certs.sh
+          ./setup-certs.sh
+
+          echo "🐳 [4/5] Building and launching containers via Docker Compose..."
           docker compose up -d --build
 
-          echo "🔍 [4/4] Verifying running services..."
+          echo "🔍 [5/5] Verifying running services..."
           docker compose ps
 
           echo "✅ Production deployment completed successfully!"
