@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "check:push": "./safety-push.sh",
+    "safety-check": "./safety-push.sh --no-push"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
