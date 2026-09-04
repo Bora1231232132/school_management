@@ -7,7 +7,11 @@
     "build": "vite build",
     "dev": "vite",
     "check:push": "./safety-push.sh",
-    "safety-check": "./safety-push.sh --no-push"
+    "safety-check": "./safety-push.sh --no-push",
+    "docker:dev": "ENV_FILE=.env.development docker compose --env-file .env.development up -d --build",
+    "docker:prod": "ENV_FILE=.env.prod docker compose --env-file .env.prod up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -69,7 +73,9 @@
     "@tailwindcss/vite": "4.1.12",
     "@types/node": "^26.4.1",
     "@vitejs/plugin-react": "4.7.0",
+    "prettier": "^3.9.6",
     "tailwindcss": "4.1.12",
+    "typescript": "^7.0.2",
     "vite": "^6.4.1"
   },
   "peerDependencies": {
