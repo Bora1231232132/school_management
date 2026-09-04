@@ -57,7 +57,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432" # host:container — use 5433 externally to avoid conflicts
+      # SAFE: Binds only to local loopback interface to prevent UFW bypass
+      - "${POSTGRES_PORT_BINDING:-127.0.0.1:5433}:5432"
     healthcheck:
       test:
         [

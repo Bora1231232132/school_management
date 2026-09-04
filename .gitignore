@@ -60,4 +60,24 @@ certs/
 *.pem
 *.pfx
 *.p12
-*.pem
+
+# Database Backups & Dumps
+backups/
+*.sql
+*.sql.gz
+*.dump
+
+# Archives & Deployment Tarballs (e.g., from deploy.ps1)
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
+
+# Temporary, Backup & OS Thumbnail files
+*.tmp
+*.temp
+*.bak
+*~
+Thumbs.db
+ehthumbs.db

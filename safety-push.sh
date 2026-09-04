@@ -296,7 +296,7 @@ check_repository_guards() {
 
   # 1. Block tracked .env files (Mirrors CI job repository-guards)
   local tracked_env
-  tracked_env="$(git ls-files '.env' '.env.*' ':!:.env.example' 2>/dev/null || true)"
+  tracked_env="$(git ls-files '.env' '.env.*' ':!:.env.example' ':!:.env.production.example' 2>/dev/null || true)"
   if [ -n "$tracked_env" ]; then
     log_fail "Tracked Secret Files" "Tracked environment files detected (CRITICAL CI BLOCKER):\n${tracked_env}\nRun: git rm --cached <file>"
   else
@@ -305,7 +305,7 @@ check_repository_guards() {
 
   # 2. Check for staged .env files
   local staged_env
-  staged_env="$(git diff --cached --name-only 2>/dev/null | grep -E '^(\.env|\.env\..*)$' | grep -v '^\.env\.example$' || true)"
+  staged_env="$(git diff --cached --name-only 2>/dev/null | grep -E '^(\.env|\.env\..*)$' | grep -v '^\.env\.example$' | grep -v '^\.env\.production\.example$' || true)"
   if [ -n "$staged_env" ]; then
     log_fail "Staged Secret Files" "Staged .env files detected:\n${staged_env}\nRun: git reset HEAD <file>"
   else
