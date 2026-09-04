@@ -29,12 +29,12 @@ flowchart TD
         UFW["UFW Firewall + Fail2ban<br/>(Ports 22, 80, 443 only)"]
         EC2Setup["scripts/ec2-setup.sh<br/>(Docker, 2GB Swap, UFW, Fail2ban)"]
         DeployScript["scripts/deploy.sh<br/>(Env verify, compose build, 2-tier health check)"]
-        
+
         subgraph Docker_Network["Docker Engine (Isolated Network)"]
             Nginx["Web / Reverse Proxy (school-web)<br/>(Ports 80 / 443 Public)"]
             App["Backend API (NestJS - Optional)<br/>(Internal network port 3000)"]
             DB[("PostgreSQL 16 Database<br/>Bound to 127.0.0.1:5433<br/>NEVER exposed to 0.0.0.0")]
-            
+
             Nginx --> App
             App --> DB
         end
@@ -52,6 +52,7 @@ flowchart TD
 The project strictly complies with 4 production security standards:
 
 ### A. Secret Protection in Git & CI
+
 1. **`.gitignore` Rules**:
    ```gitignore
    # Block all .env files except designated safe templates
@@ -75,9 +76,11 @@ The project strictly complies with 4 production security standards:
    Validates both tracked and staged files on developer machines prior to pushing.
 
 ### B. Zero Database Exposure (Docker Port Hardening)
+
 Docker by default inserts `iptables` rules that bypass UFW when ports are published. Database ports must **never** be mapped to `0.0.0.0`.
 
 In `docker-compose.yml`:
+
 ```yaml
 services:
   postgres:
@@ -88,6 +91,7 @@ services:
 ```
 
 ### C. OS-Level Defense (`scripts/ec2-setup.sh`)
+
 - **2GB Swapfile**: Allocated automatically if host RAM < 4GB, preventing Out-Of-Memory (OOM) killer terminations during `docker compose build`.
 - **UFW Firewall**: Default policy denies all incoming traffic; strictly allows:
   - `22/tcp` (SSH)
@@ -96,6 +100,7 @@ services:
 - **Fail2ban**: Intercepts SSH brute-force attacks via systemd journal and bans offending IPs for 1 hour after 5 failed attempts within 10 minutes.
 
 ### D. Zero-Downtime Deployment & Verification (`scripts/deploy.sh`)
+
 1. Enforces `chmod 600 .env` file permissions.
 2. Validates Docker Compose file syntax (`docker compose config -q`).
 3. Executes zero-orphan rebuild (`docker compose up -d --build --remove-orphans`).
@@ -109,62 +114,76 @@ services:
 ## 3. Server Specifications & AWS Provisioning
 
 ### Instance Recommendations
+
 - **Instance Type**: `t3.small` (2 vCPU, 2GB RAM) minimum; `t3.medium` (2 vCPU, 4GB RAM) recommended for production.
 - **Operating System**: Ubuntu 22.04 LTS (Jammy Jellyfish) 64-bit (x86_64 or arm64).
 - **Storage**: 20GB – 40GB gp3 EBS Volume.
 - **Elastic IP**: Allocate a static AWS Elastic IP and associate it with the EC2 instance.
 
 ### AWS Security Group Configuration
+
 Configure the EC2 instance Security Group with minimal necessary ports:
 
-| Type | Protocol | Port Range | Source | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| **Inbound** | TCP | 22 | Admin / Office CIDR (or 0.0.0.0/0 if dynamic) | Secure SSH access |
-| **Inbound** | TCP | 80 | 0.0.0.0/0, ::/0 | HTTP (Redirect to HTTPS) |
-| **Inbound** | TCP | 443 | 0.0.0.0/0, ::/0 | HTTPS Web Traffic |
-| **Outbound**| All | All | 0.0.0.0/0, ::/0 | Outbound updates / API calls |
+| Type         | Protocol | Port Range | Source                                        | Description                  |
+| :----------- | :------- | :--------- | :-------------------------------------------- | :--------------------------- |
+| **Inbound**  | TCP      | 22         | Admin / Office CIDR (or 0.0.0.0/0 if dynamic) | Secure SSH access            |
+| **Inbound**  | TCP      | 80         | 0.0.0.0/0, ::/0                               | HTTP (Redirect to HTTPS)     |
+| **Inbound**  | TCP      | 443        | 0.0.0.0/0, ::/0                               | HTTPS Web Traffic            |
+| **Outbound** | All      | All        | 0.0.0.0/0, ::/0                               | Outbound updates / API calls |
 
 ---
 
 ## 4. Step-by-Step Server Setup Runbook
 
 ### Step 1: Connect to Fresh EC2 Host
+
 ```bash
 ssh -i ~/.ssh/your-key.pem ubuntu@<EC2_ELASTIC_IP>
 ```
 
 ### Step 2: Clone Repository
+
 ```bash
 git clone https://github.com/bora168-coder/school_management.git ~/school_management
 cd ~/school_management
 ```
 
 ### Step 3: Run Host Provisioning Script
+
 Run the automated host hardening and software installation script:
+
 ```bash
 sudo ./scripts/ec2-setup.sh
 ```
+
 After the script completes, activate the Docker group membership for the current shell:
+
 ```bash
 newgrp docker
 ```
 
 ### Step 4: Configure Production Environment Variables
+
 Create the production `.env` file from the template and enforce restrictive permissions:
+
 ```bash
 cp .env.example .env
 chmod 600 .env
 nano .env
 ```
+
 Ensure you update:
+
 - `POSTGRES_USER` and `POSTGRES_PASSWORD` (use strong passwords)
 - `JWT_SECRET` (generate using `openssl rand -hex 32`)
 - `TLS_CERT_PATH` and `TLS_KEY_PATH`
 
 ### Step 5: Execute First Deployment
+
 ```bash
 ./scripts/deploy.sh
 ```
+
 The script will generate fallback TLS certificates (if not already provided), validate Compose syntax, build the containers, and run the 2-tier health check.
 
 ---
@@ -174,6 +193,7 @@ The script will generate fallback TLS certificates (if not already provided), va
 To connect securely to the EC2 instance from VS Code:
 
 ### A. Update `~/.ssh/config`
+
 Add the following block to `~/.ssh/config` on your local computer (**do not wrap in markdown backticks**):
 
 ```sshconfig
@@ -186,11 +206,13 @@ Host school-ec2
 ```
 
 ### B. Restrict Local Permissions
+
 ```bash
 chmod 600 ~/.ssh/config ~/.ssh/your-key.pem
 ```
 
 ### C. Connect via VS Code
+
 1. Open VS Code.
 2. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS).
 3. Select **Remote-SSH: Connect to Host...** &rarr; `school-ec2`.
@@ -219,6 +241,7 @@ Whenever code is pushed to `main`, `.github/workflows/deploy.yml` triggers `./sc
 ## 7. Operations & Maintenance Playbook
 
 ### Checking Container Health and Logs
+
 ```bash
 # Check service status
 docker compose ps
@@ -231,7 +254,9 @@ docker compose logs -f postgres
 ```
 
 ### PostgreSQL Database Backups
+
 Create a point-in-time database backup using Docker exec:
+
 ```bash
 # Create backups directory
 mkdir -p ~/backups
@@ -244,6 +269,7 @@ gunzip < ~/backups/school_db_YYYYMMDD_HHMMSS.sql.gz | docker compose exec -T pos
 ```
 
 ### Managing Fail2ban
+
 ```bash
 # Check SSH jail status and currently banned IPs
 sudo fail2ban-client status sshd
@@ -253,16 +279,22 @@ sudo fail2ban-client set sshd unbanip <IP_ADDRESS>
 ```
 
 ### Updating SSL / TLS Certificates
+
 If using Let's Encrypt (Certbot) on the host:
+
 ```bash
 sudo certbot certonly --standalone -d cheachantocollege.edu.kh
 ```
+
 Update `.env` to point to the live certificates:
+
 ```env
 TLS_CERT_PATH=/etc/letsencrypt/live/cheachantocollege.edu.kh/fullchain.pem
 TLS_KEY_PATH=/etc/letsencrypt/live/cheachantocollege.edu.kh/privkey.pem
 ```
+
 Reload Nginx without downtime:
+
 ```bash
 docker compose exec school-web nginx -s reload
 ```
@@ -271,11 +303,10 @@ docker compose exec school-web nginx -s reload
 
 ## 8. Troubleshooting Reference
 
-| Symptom | Probable Cause | Resolution |
-| :--- | :--- | :--- |
-| `docker compose build` crashes with exit code 137 | System ran out of memory (OOM killer) | Verify swapfile exists: `swapon --show`. If missing, run `sudo ./scripts/ec2-setup.sh` to enable 2GB swap. |
+| Symptom                                            | Probable Cause                                                      | Resolution                                                                                                                      |
+| :------------------------------------------------- | :------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------ |
+| `docker compose build` crashes with exit code 137  | System ran out of memory (OOM killer)                               | Verify swapfile exists: `swapon --show`. If missing, run `sudo ./scripts/ec2-setup.sh` to enable 2GB swap.                      |
 | Cannot connect to PostgreSQL from local admin tool | Expected security posture (PostgreSQL is bound to `127.0.0.1:5433`) | Open an SSH tunnel: `ssh -L 5433:127.0.0.1:5433 -i ~/.ssh/your-key.pem ubuntu@<EC2_IP>`. Connect your tool to `localhost:5433`. |
-| Health check fails for web tier | Container failed to start or TLS cert invalid | Run `docker compose logs school-web` to inspect Nginx startup logs. |
-| SSH connection timed out | UFW or AWS Security Group blocked port 22 | Verify Security Group inbound rule allows TCP port 22 from your current IP. |
-| `deploy.sh` fails: `.env permissions not 600` | Overly permissive file mode | Run `chmod 600 .env` and re-run `./scripts/deploy.sh`. |
-
+| Health check fails for web tier                    | Container failed to start or TLS cert invalid                       | Run `docker compose logs school-web` to inspect Nginx startup logs.                                                             |
+| SSH connection timed out                           | UFW or AWS Security Group blocked port 22                           | Verify Security Group inbound rule allows TCP port 22 from your current IP.                                                     |
+| `deploy.sh` fails: `.env permissions not 600`      | Overly permissive file mode                                         | Run `chmod 600 .env` and re-run `./scripts/deploy.sh`.                                                                          |

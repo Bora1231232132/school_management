@@ -180,9 +180,7 @@ export function About() {
                 className="w-full aspect-video object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent p-8 flex flex-col justify-end">
-                <h4 className="text-white text-2xl font-bold mb-2">
-                  Uniform
-                </h4>
+                <h4 className="text-white text-2xl font-bold mb-2">Uniform</h4>
                 <p className="text-white/80">
                   Our students come from every province in Cambodia, bringing
                   unique perspectives.
@@ -197,7 +195,7 @@ export function About() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent p-8 flex flex-col justify-end">
                 <h4 className="text-white text-2xl font-bold mb-2">
-                  Branding Guideline 
+                  Branding Guideline
                 </h4>
                 <p className="text-white/80">
                   98% of our graduates progress to world-class universities and

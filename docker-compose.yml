@@ -14,7 +14,7 @@ services:
       - ${TLS_CERT_PATH:-./certs/dev-cert.pem}:/etc/ssl/certs/cheachantocollege.crt:ro
       - ${TLS_KEY_PATH:-./certs/dev-key.pem}:/etc/ssl/private/cheachantocollege.key:ro
     healthcheck:
-      test: ["CMD", "curl", "-k", "-f", "https://localhost/"]
+      test: [ "CMD", "curl", "-k", "-f", "https://localhost/" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -60,15 +60,10 @@ services:
       # SAFE: Binds only to local loopback interface to prevent UFW bypass
       - "${POSTGRES_PORT_BINDING:-127.0.0.1:5433}:5432"
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-school_db}",
-        ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-school_db}" ]
       interval: 10s
       timeout: 5s
       retries: 5
-
   # ─── Database Admin UI (pgAdmin) ─────────────────────────────────
   # Optional – access at http://localhost:5050
   # Uncomment to enable

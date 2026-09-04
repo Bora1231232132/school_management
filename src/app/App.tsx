@@ -1,15 +1,20 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { Home } from './pages/Home';
-import { About } from './pages/About';
-import { Academic } from './pages/Academic';
-import { Admission } from './pages/Admission';
-import { CampusLife } from './pages/CampusLife';
-import { News } from './pages/News';
-import { Admin } from './pages/Admin';
-import { useEffect } from 'react';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
+import { Home } from "./pages/Home";
+import { About } from "./pages/About";
+import { Academic } from "./pages/Academic";
+import { Admission } from "./pages/Admission";
+import { CampusLife } from "./pages/CampusLife";
+import { News } from "./pages/News";
+import { Admin } from "./pages/Admin";
+import { useEffect } from "react";
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -22,7 +27,7 @@ function ScrollToTop() {
 
 function AppContent() {
   const location = useLocation();
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isAdmin = location.pathname.startsWith("/admin");
 
   return (
     <div className="min-h-screen bg-white font-['Cabin']">

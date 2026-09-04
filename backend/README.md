@@ -52,15 +52,15 @@ backend/
 
 ## 🔌 Environment Variables (from root `.env`)
 
-| Variable     | Description                |
-| ------------ | -------------------------- |
-| `DB_HOST`    | Database host (`postgres`) |
-| `DB_PORT`    | Database port (`5432`)     |
-| `DB_NAME`    | Database name              |
-| `DB_USER`    | Database user              |
-| `DB_PASS`    | Database password          |
-| `NODE_ENV`   | Environment (`production`) |
-| `PORT`          | API port (`3000`)                   |
-| `JWT_SECRET`    | Secret for JWT tokens               |
-| `TLS_CERT_PATH` | Path to TLS/SSL certificate file    |
-| `TLS_KEY_PATH`  | Path to TLS/SSL private key file    |
+| Variable        | Description                      |
+| --------------- | -------------------------------- |
+| `DB_HOST`       | Database host (`postgres`)       |
+| `DB_PORT`       | Database port (`5432`)           |
+| `DB_NAME`       | Database name                    |
+| `DB_USER`       | Database user                    |
+| `DB_PASS`       | Database password                |
+| `NODE_ENV`      | Environment (`production`)       |
+| `PORT`          | API port (`3000`)                |
+| `JWT_SECRET`    | Secret for JWT tokens            |
+| `TLS_CERT_PATH` | Path to TLS/SSL certificate file |
+| `TLS_KEY_PATH`  | Path to TLS/SSL private key file |
