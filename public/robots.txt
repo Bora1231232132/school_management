@@ -1,0 +1,9 @@
+# robots.txt for https://cheachantocollege.edu.kh
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://cheachantocollege.edu.kh/sitemap.xml
+
