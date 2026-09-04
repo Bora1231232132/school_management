@@ -36,12 +36,15 @@ function AppContent() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/index.html" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/academic" element={<Academic />} />
           <Route path="/admission" element={<Admission />} />
           <Route path="/campus-life" element={<CampusLife />} />
           <Route path="/news" element={<News />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="*" element={<Home />} />
         </Routes>
       </main>
       {!isAdmin && <Footer />}

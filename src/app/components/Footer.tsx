@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Facebook,
   Instagram,
@@ -15,13 +16,13 @@ export function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
         {/* Brand */}
         <div className="space-y-6">
-          <a href="/" className="block">
+          <Link to="/home" className="block">
             <img
               src={logoWhite}
               alt="Chea Chanto College Logo"
               className="h-16 w-auto"
             />
-          </a>
+          </Link>
           <p className="text-white/70 leading-relaxed">
             Where talent meets opportunity. Empowering the next generation of
             leaders through quality education and innovation.
@@ -44,38 +45,38 @@ export function Footer() {
           <h3 className="font-bold text-lg mb-6">Explore</h3>
           <ul className="space-y-4 text-white/70">
             <li>
-              <a href="/about" className="hover:text-white transition-colors">
+              <Link to="/about" className="hover:text-white transition-colors">
                 About Our School
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/academic"
+              <Link
+                to="/academic"
                 className="hover:text-white transition-colors"
               >
                 Academic Programs
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/admission"
+              <Link
+                to="/admission"
                 className="hover:text-white transition-colors"
               >
                 Admission Process
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="/campus-life"
+              <Link
+                to="/campus-life"
                 className="hover:text-white transition-colors"
               >
                 Campus Life
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/news" className="hover:text-white transition-colors">
+              <Link to="/news" className="hover:text-white transition-colors">
                 News & Events
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

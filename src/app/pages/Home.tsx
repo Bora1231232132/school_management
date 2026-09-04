@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -63,12 +64,18 @@ export function Home() {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <button className="bg-[#182B70] text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-[#1e358c] transition-all flex items-center gap-2">
+            <Link
+              to="/academic"
+              className="bg-[#182B70] text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-[#1e358c] transition-all flex items-center justify-center gap-2"
+            >
               Discover Our Programs <ArrowRight size={20} />
-            </button>
-            <button className="bg-white text-[#182B70] px-8 py-4 rounded-full font-bold text-lg hover:bg-white/90 transition-all">
+            </Link>
+            <Link
+              to="/admission"
+              className="bg-white text-[#182B70] px-8 py-4 rounded-full font-bold text-lg hover:bg-white/90 transition-all text-center"
+            >
               Apply for 2026
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -130,9 +137,12 @@ export function Home() {
                 </li>
               ))}
             </ul>
-            <button className="text-[#182B70] font-bold text-lg border-b-2 border-[#182B70] pb-1 hover:border-transparent transition-all">
+            <Link
+              to="/about"
+              className="text-[#182B70] font-bold text-lg border-b-2 border-[#182B70] pb-1 hover:border-transparent transition-all inline-block"
+            >
               Learn More About Our Vision
-            </button>
+            </Link>
           </div>
           <div className="flex-1 relative">
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
@@ -160,9 +170,12 @@ export function Home() {
                 Stay updated with the latest happenings at Chea Chanto College.
               </p>
             </div>
-            <button className="hidden sm:flex items-center gap-2 text-[#182B70] font-bold uppercase tracking-wider text-sm">
+            <Link
+              to="/news"
+              className="hidden sm:flex items-center gap-2 text-[#182B70] font-bold uppercase tracking-wider text-sm"
+            >
               View All Posts <ArrowRight size={16} />
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -209,9 +222,12 @@ export function Home() {
             ))}
           </div>
 
-          <button className="sm:hidden w-full mt-10 border-2 border-[#182B70] text-[#182B70] py-4 rounded-xl font-bold uppercase tracking-widest text-sm">
+          <Link
+            to="/news"
+            className="sm:hidden w-full mt-10 border-2 border-[#182B70] text-[#182B70] py-4 rounded-xl font-bold uppercase tracking-widest text-sm block text-center"
+          >
             View All Posts
-          </button>
+          </Link>
         </div>
       </section>
     </div>
