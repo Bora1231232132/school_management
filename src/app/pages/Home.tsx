@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 
-// Figma Assets
-import heroCampusImg from "../../assets/figma/hero-campus.png";
-import educationAcademicImg from "../../assets/figma/education-academic.png";
-import communityLifeImg from "../../assets/figma/community-life.png";
-import newsScienceFairImg from "../../assets/figma/news-science-fair.png";
-import newsInternationalDayImg from "../../assets/figma/news-international-day.png";
-import newsVarsityTeamImg from "../../assets/figma/news-varsity-team.png";
+// home Assets
+import heroCampusImg from "../../assets/home/hero-campus.png";
+import educationAcademicImg from "../../assets/home/education-academic.png";
+import communityLifeImg from "../../assets/home/community-life.png";
+import newsScienceFairImg from "../../assets/home/news-science-fair.png";
+import newsInternationalDayImg from "../../assets/home/news-international-day.png";
+import newsVarsityTeamImg from "../../assets/home/news-varsity-team.png";
 
 interface NewsItem {
   id: number;
