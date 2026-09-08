@@ -189,7 +189,7 @@ export function Home() {
               <img
                 src={communityLifeImg}
                 alt="Community life"
-                className="absolute bottom-0 right-0 sm:left-40 sm:top-40 w-[220px] sm:w-[320px] h-[220px] sm:h-[320px] object-cover rounded-[16px] shadow-2xl border-4 border-[#182B70]"
+                className="absolute bottom-0 right-0 sm:left-40 sm:top-40 w-[220px] sm:w-[320px] h-[220px] sm:h-[320px] object-cover rounded-[16px]"
               />
             </div>
 
