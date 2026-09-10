@@ -273,20 +273,10 @@ export function About() {
                 student growth. Together, they oversee academics, student life,
                 admissions, partnerships, and school operations while creating a
                 safe, respectful, and encouraging environment in which every
-                student can thrive.
-              </p>
-            </div>
-
-            {/* Our Partners */}
-            <div className="space-y-3 pt-2">
-              <h3 className="text-[#182B70] text-xl sm:text-2xl font-bold leading-snug">
-                Our Partners
-              </h3>
-              <p className="text-[#25252A] text-base leading-relaxed font-normal">
-                CCC works with universities, educational institutions,
-                organisations, and community partners to broaden learning
-                opportunities, strengthen career exposure, and create pathways
-                for students beyond secondary school.
+                student can thrive. Our Partners CCC works with universities,
+                educational institutions, organisations, and community partners
+                to broaden learning opportunities, strengthen career exposure,
+                and create pathways for students beyond secondary school.
               </p>
             </div>
           </motion.div>
