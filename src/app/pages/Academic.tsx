@@ -1,286 +1,459 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import {
-  Book,
-  Microscope,
-  Library,
-  Trophy,
-  GraduationCap,
-  ChevronRight,
-  Binary,
-  Globe,
-} from "lucide-react";
+import { ChevronRight, Download } from "lucide-react";
+
+// Academic Assets (Figma Node 802-529)
+import teaching1Img from "../../assets/academic/teaching-1.png";
+import teaching2Img from "../../assets/academic/teaching-2.png";
+import facilityLearningImg from "../../assets/academic/facility-learning-spaces.png";
+import facilityLabImg from "../../assets/academic/facility-laboratories.png";
+import careerEngImg from "../../assets/academic/career-engineering.png";
+import careerTechImg from "../../assets/academic/career-tech-5dc579.png";
+import careerBizImg from "../../assets/academic/career-business-5cebc5.png";
+import careerHealthImg from "../../assets/academic/career-healthcare-5822dd.png";
+
+// Academic SVG Icons
+import iconNational from "../../assets/academic/icon-national-curriculum.svg";
+import iconInternational from "../../assets/academic/icon-international-curriculum.svg";
+import iconEnglish from "../../assets/academic/icon-english.svg";
+import iconComputer from "../../assets/academic/icon-computer.svg";
+import iconEngineering from "../../assets/academic/icon-engineering.svg";
+import iconTech from "../../assets/academic/icon-technology.svg";
+import iconBusiness from "../../assets/academic/icon-business.svg";
+import iconHealth from "../../assets/academic/icon-healthcare.svg";
 
 export function Academic() {
+  const programmes = [
+    {
+      icon: iconNational,
+      title: "CAMBODIAN NATIONAL CURRICULUM",
+      desc: "CCC follows the curriculum developed by Cambodia’s Ministry of Education, Youth and Sport. Students build strong foundations in Khmer language, mathematics, physics, chemistry, biology, earth science, history, geography, morality, and ethics. The programme strengthens core academic competencies and prepares students for national examinations.",
+    },
+    {
+      icon: iconInternational,
+      title: "INTERNATIONAL CURRICULUM",
+      desc: "CCC offers International and AP subjects. These internationally recognised programmes deepen subject knowledge and place strong emphasis on critical thinking, problem-solving, and independent learning. Students may study subjects such as Mathematics, Physics, Chemistry, Biology, and English, allowing them to develop specialisation in line with their interests and future plans. Students who successfully complete their examinations receive subject-based certificates recognised by universities around the world.",
+    },
+    {
+      icon: iconEnglish,
+      title: "ENGLISH LANGUAGE DEVELOPMENT",
+      desc: "English is integrated throughout student learning and strengthened through a dedicated programme informed by the ACE curriculum. Students develop listening, speaking, reading, and writing skills for both academic study and everyday communication. The goal is not only proficiency, but the confidence to participate in classrooms, universities, workplaces, and international settings.",
+    },
+    {
+      icon: iconComputer,
+      title: "COMPUTER AND DIGITAL LITERACY",
+      desc: "Students learn how to use technology confidently, responsibly, and effectively. The programme develops practical skills in digital reading, academic writing, online research, productivity tools, information evaluation, and digital citizenship, supporting both current learning and future study.",
+    },
+  ];
+
+  const careerCards = [
+    {
+      img: careerEngImg,
+      icon: iconEngineering,
+      title: "Engineering",
+      desc: "Civil, mechanical, electrical, software, and environmental engineering.",
+    },
+    {
+      img: careerTechImg,
+      icon: iconTech,
+      title: "Technology & Innovation",
+      desc: "Data science, artificial intelligence, machine learning, cybersecurity, and financial technology.",
+    },
+    {
+      img: careerBizImg,
+      icon: iconBusiness,
+      title: "Business & Finance",
+      desc: "Economics, banking, entrepreneurship, management, and international trade.",
+    },
+    {
+      img: careerHealthImg,
+      icon: iconHealth,
+      title: "Healthcare & Life Sciences",
+      desc: "Medicine, public health, food chemistry, laboratory science, and medical technology.",
+    },
+  ];
+
   return (
-    <div className="pt-24 flex flex-col">
-      {/* Header */}
-      <section className="bg-[#182B70] text-white py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-bold mb-6"
+    <div className="flex flex-col font-sora bg-white text-[#25252A] overflow-hidden pt-20 md:pt-24">
+      {/* 1. Breadcrumbs (#802:573) */}
+      <section className="w-full max-w-[1512px] mx-auto px-6 md:px-12 lg:px-[152px] pt-4 pb-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-1.5 text-xs text-[#66666E]"
+        >
+          <Link
+            to="/home"
+            className="hover:text-[#182B70] transition-colors font-normal"
           >
-            Academic Excellence
-          </motion.h1>
-          <p className="text-white/80 text-xl max-w-3xl leading-relaxed">
-            A rigorous and balanced curriculum designed to challenge the
-            intellect and prepare students for global success.
+            Home
+          </Link>
+          <ChevronRight size={14} className="text-[#66666E]" />
+          <span className="text-[#182B70] font-bold">Academics</span>
+        </nav>
+      </section>
+
+      {/* 2. Our Study Programmes (#802:530) */}
+      <section className="w-full max-w-[1512px] mx-auto px-6 md:px-12 lg:px-[152px] py-8 md:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="space-y-4 mb-10 md:mb-14"
+        >
+          <h1 className="text-[#182B70] text-2xl sm:text-3xl lg:text-[32px] font-bold leading-tight tracking-tight">
+            Our Study Programmes
+          </h1>
+          <p className="text-[#25252A] text-sm sm:text-[15px] font-normal leading-relaxed">
+            CCC offers a dual academic programme that combines the Cambodian
+            National Curriculum with International qualifications. This approach
+            gives students a strong grounding in Cambodia’s national education
+            system while developing the analytical skills, independence, and
+            global perspective required for future study and work.
           </p>
+        </motion.div>
+
+        {/* 4 Columns with vertical dividers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-[#D8D8DA]">
+          {programmes.map((prog, idx) => (
+            <motion.div
+              key={prog.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="flex flex-col gap-4 lg:px-6 first:lg:pl-0 last:lg:pr-0"
+            >
+              <div className="flex items-start gap-3">
+                <img
+                  src={prog.icon}
+                  alt=""
+                  className="w-8 h-8 shrink-0 mt-0.5"
+                />
+                <h2 className="text-[#25252A] text-lg lg:text-[18px] xl:text-[20px] font-bold leading-snug uppercase">
+                  {prog.title}
+                </h2>
+              </div>
+              <p className="text-[#66666E] text-sm sm:text-[15px] leading-relaxed">
+                {prog.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* Curriculum Section */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="group p-10 bg-gray-50 rounded-3xl border border-transparent hover:border-[#182B70]/20 transition-all">
-            <div className="w-14 h-14 bg-[#182B70] rounded-xl flex items-center justify-center mb-8">
-              <Globe className="text-white" size={28} />
-            </div>
-            <h3 className="text-[#182B70] text-2xl font-bold mb-4">
-              National Curriculum
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Full compliance with the Ministry of Education, Youth and Sport
-              (MoEYS) standards, enhanced with advanced depth and critical
-              analysis.
+      {/* 3. Teaching & Learning (#802:560) */}
+      <section className="w-full max-w-[1512px] mx-auto px-6 md:px-12 lg:px-[152px] py-12 md:py-16">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-12">
+          {/* Left: Text */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex-1 space-y-4"
+          >
+            <h2 className="text-[#182B70] text-2xl sm:text-3xl lg:text-[32px] font-bold leading-tight">
+              Teaching & Learning
+            </h2>
+            <p className="text-[#25252A] text-sm sm:text-[15px] font-normal leading-relaxed">
+              Learning at CCC is active, purposeful, and centred on student
+              growth. Teachers use discussion, collaborative work, projects,
+              experiments, and real-world problem-solving to help students
+              understand ideas deeply rather than simply memorise information.
+              Regular feedback and growth-focused assessment help students
+              recognise their progress, respond to challenges, and take greater
+              responsibility for their learning.
             </p>
-            <ul className="space-y-3">
-              {[
-                "Advanced Khmer Literature",
-                "Intensive Mathematics",
-                "Physics & Chemistry",
-                "Civic Education",
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2 text-sm font-semibold text-[#182B70]"
-                >
-                  <ChevronRight size={16} /> {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="group p-10 bg-gray-50 rounded-3xl border border-transparent hover:border-[#182B70]/20 transition-all">
-            <div className="w-14 h-14 bg-[#182B70] rounded-xl flex items-center justify-center mb-8">
-              <Binary className="text-white" size={28} />
-            </div>
-            <h3 className="text-[#182B70] text-2xl font-bold mb-4">
-              International Curriculum
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Our IGCSE and A-Level pathways provide students with globally
-              recognized qualifications for university entry worldwide.
-            </p>
-            <ul className="space-y-3">
-              {[
-                "Cambridge International IGCSE",
-                "AS & A Level Programs",
-                "Advanced English Program",
-                "STEM Innovation Track",
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2 text-sm font-semibold text-[#182B70]"
-                >
-                  <ChevronRight size={16} /> {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+          </motion.div>
+
+          {/* Right: Overlapping Photos */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="relative w-full max-w-[500px] lg:max-w-[560px] h-[340px] sm:h-[420px] lg:h-[451px] shrink-0 mx-auto lg:mx-0"
+          >
+            {/* Image 1 (Lower Left) */}
+            <img
+              src={teaching1Img}
+              alt="Teaching & Learning"
+              className="absolute left-0 bottom-0 lg:bottom-auto lg:top-[131px] w-[58%] lg:w-[320px] aspect-square lg:h-[320px] rounded-[20px] sm:rounded-[24px] object-cover shadow-sm border border-gray-100"
+            />
+            {/* Image 2 (Upper Right) */}
+            <img
+              src={teaching2Img}
+              alt="Collaborative Learning"
+              className="absolute right-0 lg:right-auto lg:left-[240px] top-0 lg:top-[32px] w-[58%] lg:w-[320px] aspect-square lg:h-[320px] rounded-[14px] sm:rounded-[16px] object-cover shadow-sm border border-gray-100"
+            />
+          </motion.div>
         </div>
       </section>
 
-      {/* Career Readiness Pathway */}
-      <section className="py-24 px-6 bg-[#182B70] text-white overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center mb-20">
-          <h2 className="text-4xl font-bold mb-6">
+      {/* 4. Peer Mentorship and Orientation Programme (#807:778) */}
+      <section className="w-full max-w-[1512px] mx-auto px-6 md:px-12 lg:px-[152px] py-12 md:py-16">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-12 lg:gap-12">
+          {/* Left: Overlapping Photos */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="relative w-full max-w-[500px] lg:max-w-[560px] h-[340px] sm:h-[420px] lg:h-[451px] shrink-0 mx-auto lg:mx-0"
+          >
+            {/* Image 1 (Upper Left) */}
+            <img
+              src={teaching1Img}
+              alt="Peer Mentorship"
+              className="absolute left-0 top-0 lg:top-[32px] w-[58%] lg:w-[320px] aspect-square lg:h-[320px] rounded-[20px] sm:rounded-[24px] object-cover shadow-sm border border-gray-100"
+            />
+            {/* Image 2 (Lower Right) */}
+            <img
+              src={teaching2Img}
+              alt="Student Mentors"
+              className="absolute right-0 lg:right-auto lg:left-[240px] bottom-0 lg:bottom-auto lg:top-[131px] w-[58%] lg:w-[320px] aspect-square lg:h-[320px] rounded-[14px] sm:rounded-[16px] object-cover shadow-sm border border-gray-100"
+            />
+          </motion.div>
+
+          {/* Right: Text */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex-1 space-y-4"
+          >
+            <h2 className="text-[#182B70] text-2xl sm:text-3xl lg:text-[32px] font-bold leading-tight">
+              Peer Mentorship and Orientation Programme
+            </h2>
+            <p className="text-[#25252A] text-sm sm:text-[15px] font-normal leading-relaxed">
+              Learning continues through CCC’s Peer Mentorship and Orientation
+              Programme. Trained senior and junior mentors provide academic
+              guidance, tutoring, and personal support through one-to-one
+              check-ins and small-group activities. The programme helps students
+              settle into school life, build confidence, strengthen leadership,
+              and feel connected to the wider CCC community.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 5. Academic Facilities (#808:827) */}
+      <section className="w-full max-w-[1512px] mx-auto px-6 md:px-12 lg:px-[152px] py-12 md:py-16">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-[#182B70] text-2xl sm:text-3xl lg:text-[32px] font-bold leading-tight mb-10"
+        >
+          Academic Facilities
+        </motion.h2>
+
+        <div className="space-y-10 md:space-y-12">
+          {/* Facility 1: Modern Learning Spaces */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12"
+          >
+            <div className="flex-1 space-y-3 pt-0 md:pt-4">
+              <h3 className="text-[#25252A] text-lg sm:text-xl font-bold leading-snug">
+                Modern Learning Spaces
+              </h3>
+              <p className="text-[#25252A] text-sm sm:text-[15px] leading-relaxed">
+                Technology-enabled classrooms designed for focused study, active
+                participation, and collaboration.
+              </p>
+            </div>
+            <div className="w-full md:w-[500px] h-[260px] sm:h-[320px] shrink-0">
+              <img
+                src={facilityLearningImg}
+                alt="Modern Learning Spaces"
+                className="w-full h-full object-cover rounded-[24px] shadow-sm border border-gray-100"
+              />
+            </div>
+          </motion.div>
+
+          {/* Facility 2: Science & Technology Laboratories */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-12"
+          >
+            <div className="w-full md:w-[500px] h-[260px] sm:h-[320px] shrink-0">
+              <img
+                src={facilityLabImg}
+                alt="Science & Technology Laboratories"
+                className="w-full h-full object-cover rounded-[24px] shadow-sm border border-gray-100"
+              />
+            </div>
+            <div className="flex-1 space-y-3 pt-0 md:pt-4">
+              <h3 className="text-[#25252A] text-lg sm:text-xl font-bold leading-snug">
+                Science & Technology Laboratories
+              </h3>
+              <p className="text-[#25252A] text-sm sm:text-[15px] leading-relaxed">
+                Dedicated laboratories for physics, chemistry, biology, and
+                computing, giving students space to experiment, test ideas, and
+                learn by doing.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Facility 3: Library & Learning Resource Centre */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12"
+          >
+            <div className="flex-1 space-y-3 pt-0 md:pt-4">
+              <h3 className="text-[#25252A] text-lg sm:text-xl font-bold leading-snug">
+                Library & Learning Resource Centre
+              </h3>
+              <p className="text-[#25252A] text-sm sm:text-[15px] leading-relaxed">
+                A welcoming space for reading, research, independent study, and
+                group work, supported by print and digital resources.
+              </p>
+            </div>
+            <div className="w-full md:w-[500px] h-[260px] sm:h-[320px] shrink-0">
+              <img
+                src={facilityLearningImg}
+                alt="Library & Learning Resource Centre"
+                className="w-full h-full object-cover rounded-[24px] shadow-sm border border-gray-100"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 6. College & Career Readiness (#812:882) */}
+      <section className="w-full max-w-[1512px] mx-auto px-6 md:px-12 lg:px-[152px] py-12 md:py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="space-y-6 mb-12"
+        >
+          <h2 className="text-[#182B70] text-2xl sm:text-3xl lg:text-[32px] font-bold leading-tight">
             College & Career Readiness
           </h2>
-          <p className="text-white/70 text-lg max-w-2xl mx-auto">
-            From your first day to your future career, we provide the pathway to
-            success.
-          </p>
-        </div>
 
-        <div className="max-w-5xl mx-auto relative px-4">
-          {/* Pathway Line */}
-          <div className="absolute top-1/2 left-0 w-full h-1 bg-white/20 -translate-y-1/2 hidden md:block" />
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <h3 className="text-[#25252A] text-lg sm:text-xl font-bold leading-snug">
+                Preparing Students for Life Beyond CCC
+              </h3>
+              <p className="text-[#25252A] text-sm sm:text-[15px] font-normal leading-relaxed">
+                CCC helps each student make informed decisions about what comes
+                next. Through academic advising, mentoring, skills development,
+                career exposure, and partnerships, students explore pathways
+                that fit their interests, strengths, and circumstances. These
+                may include university study in Cambodia or abroad, vocational
+                and technical training, or entry into the workforce.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
-            {[
-              {
-                year: "Year 1-2",
-                title: "Foundations",
-                desc: "Developing core academic skills and discovering passions.",
-                icon: Book,
-              },
-              {
-                year: "Year 3-4",
-                title: "Specialization",
-                desc: "Deep diving into STEM or Humanities tracks with IGCSE.",
-                icon: Microscope,
-              },
-              {
-                year: "Year 5-6",
-                title: "Pre-University",
-                desc: "A-Level excellence and university application preparation.",
-                icon: Library,
-              },
-              {
-                year: "Future",
-                title: "Global Leader",
-                desc: "Thriving in top universities and STEM careers worldwide.",
-                icon: GraduationCap,
-              },
-            ].map((step, idx) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                className="bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/10 flex flex-col items-center text-center group hover:bg-white hover:text-[#182B70] transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-white text-[#182B70] rounded-full flex items-center justify-center mb-6 font-bold group-hover:bg-[#182B70] group-hover:text-white transition-colors">
-                  <step.icon size={24} />
+            <div className="space-y-2">
+              <h3 className="text-[#25252A] text-lg sm:text-xl font-bold leading-snug">
+                University Pathways
+              </h3>
+              <p className="text-[#25252A] text-sm sm:text-[15px] font-normal leading-relaxed">
+                CCC seeks to build strong pathways to universities and
+                scholarship opportunities in Cambodia and internationally,
+                including destinations such as the United States, the United
+                Kingdom, Canada, France, Germany, Australia, Singapore, South
+                Korea, China, Japan, and Hungary.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-[#25252A] text-lg sm:text-xl font-bold leading-snug">
+                Career Pathways Introduction
+              </h3>
+              <p className="text-[#25252A] text-sm sm:text-[15px] font-normal leading-relaxed">
+                A strong foundation in STEM, English, leadership, and digital
+                literacy allows students to explore a wide range of fields that
+                matter to Cambodia and the wider world.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* 4 Career Pathway Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {careerCards.map((card, idx) => (
+            <motion.div
+              key={card.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="flex flex-col"
+            >
+              <div className="w-full h-[280px] sm:h-[320px] overflow-hidden rounded-[24px]">
+                <img
+                  src={card.img}
+                  alt={card.title}
+                  className="w-full h-full object-cover rounded-[24px] hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="pt-6 space-y-2">
+                <div className="flex items-center gap-3">
+                  <img src={card.icon} alt="" className="w-8 h-8 shrink-0" />
+                  <h3 className="text-[#25252A] text-lg sm:text-xl font-bold leading-snug">
+                    {card.title}
+                  </h3>
                 </div>
-                <div className="text-sm font-bold uppercase tracking-widest mb-2 opacity-70">
-                  {step.year}
-                </div>
-                <h4 className="text-xl font-bold mb-4">{step.title}</h4>
-                <p className="text-sm leading-relaxed opacity-80 group-hover:opacity-100">
-                  {step.desc}
+                <p className="text-[#66666E] text-sm sm:text-[15px] leading-relaxed">
+                  {card.desc}
                 </p>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* Facilities */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <h2 className="text-[#182B70] text-4xl font-bold mb-4">
-                Modern Facilities
-              </h2>
-              <p className="text-gray-500 text-lg">
-                World-class spaces designed for inspired learning.
-              </p>
-            </div>
-            <button className="bg-[#182B70] text-white px-8 py-3 rounded-full font-bold">
-              Virtual Campus Tour
+      {/* 7. Academic Calendar (#815:1055) */}
+      <section className="w-full max-w-[1512px] mx-auto px-6 md:px-12 lg:px-[152px] pt-12 pb-20 md:pb-28">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="space-y-4 max-w-4xl"
+        >
+          <h2 className="text-[#182B70] text-2xl sm:text-3xl lg:text-[32px] font-bold leading-tight">
+            Academic Calendar
+          </h2>
+          <p className="text-[#25252A] text-sm sm:text-[15px] font-normal leading-relaxed">
+            The CCC academic year runs from August to May, except for the
+            academic year 2026-2027 where it runs from September to early July.
+            Important dates, school holidays, examinations, and major events are
+            published in the academic calendar below.
+          </p>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() =>
+                alert("Academic Calendar download will be available soon.")
+              }
+              className="inline-flex items-center justify-center gap-2 bg-[#182B70] hover:bg-[#122055] text-white px-6 py-3 rounded-full text-base font-normal transition-colors shadow-sm cursor-pointer"
+            >
+              <span>Download Academic Calendar</span>
+              <Download size={20} className="text-white" />
             </button>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-4">
-              <ImageWithFallback
-                src="https://images.unsplash.com/photo-1759092912891-9f52486bb059?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzY2llbmNlJTIwbGFib3JhdG9yeSUyMHNjaG9vbHxlbnwxfHx8fDE3NzAzNjUwMjh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="Science Lab"
-                className="rounded-2xl aspect-[4/3] object-cover w-full shadow-lg"
-              />
-              <h4 className="text-[#182B70] font-bold text-xl">
-                Advanced STEM Labs
-              </h4>
-              <p className="text-gray-500 text-sm">
-                Fully equipped physics, chemistry, and biology laboratories for
-                hands-on experimentation.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <ImageWithFallback
-                src="https://images.unsplash.com/photo-1760062744828-64801c56a039?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaXZlcnNlJTIwc3R1ZGVudHMlMjBzdHVkeWluZyUyMGluJTIwbW9kZXJuJTIwbGlicmFyeXxlbnwxfHx8fDE3NzAzNjUwMjd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="Library"
-                className="rounded-2xl aspect-[4/3] object-cover w-full shadow-lg"
-              />
-              <h4 className="text-[#182B70] font-bold text-xl">
-                Digital Knowledge Hub
-              </h4>
-              <p className="text-gray-500 text-sm">
-                A modern library with vast digital resources and quiet study
-                zones.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <ImageWithFallback
-                src="https://images.unsplash.com/photo-1563299967-5208dc3f5d19?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY2hvb2wlMjBiYXNrZXRiYWxsJTIwY291cnQlMjBjYW1wdXN8ZW58MXx8fHwxNzcwMzY1MDI4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                alt="Sports"
-                className="rounded-2xl aspect-[4/3] object-cover w-full shadow-lg"
-              />
-              <h4 className="text-[#182B70] font-bold text-xl">
-                Elite Sports Facilities
-              </h4>
-              <p className="text-gray-500 text-sm">
-                Indoor courts, football fields, and fitness centers to promote
-                physical well-being.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Calendar Section */}
-      <section className="py-24 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto bg-white rounded-3xl p-12 shadow-xl border border-gray-100">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
-            <h2 className="text-[#182B70] text-3xl font-bold">
-              Academic Calendar 2026
-            </h2>
-            <button className="bg-[#182B70] text-white px-8 py-3 rounded-xl font-bold text-sm">
-              Download PDF (2.4MB)
-            </button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b-2 border-gray-100">
-                  <th className="pb-6 font-bold text-[#182B70]">Term</th>
-                  <th className="pb-6 font-bold text-[#182B70]">Start Date</th>
-                  <th className="pb-6 font-bold text-[#182B70]">End Date</th>
-                  <th className="pb-6 font-bold text-[#182B70]">Events</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {[
-                  {
-                    term: "Term 1",
-                    start: "Sept 1, 2025",
-                    end: "Dec 15, 2025",
-                    event: "New Student Orientation",
-                  },
-                  {
-                    term: "Term 2",
-                    start: "Jan 5, 2026",
-                    end: "Mar 25, 2026",
-                    event: "Annual STEM Week",
-                  },
-                  {
-                    term: "Term 3",
-                    start: "Apr 10, 2026",
-                    end: "Jun 30, 2026",
-                    event: "Graduation Ceremony",
-                  },
-                ].map((row, i) => (
-                  <tr key={i} className="group">
-                    <td className="py-6 font-bold text-[#182B70]">
-                      {row.term}
-                    </td>
-                    <td className="py-6 text-gray-600">{row.start}</td>
-                    <td className="py-6 text-gray-600">{row.end}</td>
-                    <td className="py-6 font-medium text-gray-600">
-                      {row.event}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );
